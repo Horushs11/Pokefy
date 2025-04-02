@@ -1,29 +1,52 @@
 // src/components/PokemonList.jsx
 import { useEffect, useState, useMemo, useRef } from "react";
 import PokemonModal from "./PokemonModal";
-import { ChevronDown, Filter } from "lucide-react";
+import PokemonCard from "./PokemonCard";
+import { ChevronDown, Filter, ArrowUpCircle } from "lucide-react";
 import Fuse from "fuse.js";
 import gsap from "gsap";
-import logo from "../assets/pokeball.png"; // Asegúrate de tener este archivo en assets
+import logo from "../assets/pokeball.png";
 
 const typeTranslations = {
-  normal: "Normal", fire: "Fuego", water: "Agua", electric: "Eléctrico",
-  grass: "Planta", ice: "Hielo", fighting: "Lucha", poison: "Veneno",
-  ground: "Tierra", flying: "Volador", psychic: "Psíquico", bug: "Bicho",
-  rock: "Roca", ghost: "Fantasma", dark: "Siniestro", dragon: "Dragón",
-  steel: "Acero", fairy: "Hada"
+  normal: "Normal",
+  fire: "Fuego",
+  water: "Agua",
+  electric: "Eléctrico",
+  grass: "Planta",
+  ice: "Hielo",
+  fighting: "Lucha",
+  poison: "Veneno",
+  ground: "Tierra",
+  flying: "Volador",
+  psychic: "Psíquico",
+  bug: "Bicho",
+  rock: "Roca",
+  ghost: "Fantasma",
+  dark: "Siniestro",
+  dragon: "Dragón",
+  steel: "Acero",
+  fairy: "Hada",
 };
 
 const typeColors = {
-  grass: "bg-green-400 text-white", fire: "bg-red-500 text-white",
-  water: "bg-blue-400 text-white", bug: "bg-lime-500 text-white",
-  normal: "bg-gray-400 text-white", poison: "bg-purple-500 text-white",
-  electric: "bg-yellow-400 text-black", ground: "bg-yellow-700 text-white",
-  fairy: "bg-pink-400 text-white", fighting: "bg-red-700 text-white",
-  psychic: "bg-pink-600 text-white", rock: "bg-yellow-800 text-white",
-  ghost: "bg-indigo-800 text-white", ice: "bg-blue-200 text-black",
-  dragon: "bg-indigo-600 text-white", dark: "bg-gray-800 text-white",
-  steel: "bg-gray-500 text-white", flying: "bg-sky-300 text-black",
+  grass: "bg-green-400 text-white",
+  fire: "bg-red-500 text-white",
+  water: "bg-blue-400 text-white",
+  bug: "bg-lime-500 text-white",
+  normal: "bg-gray-400 text-white",
+  poison: "bg-purple-500 text-white",
+  electric: "bg-yellow-400 text-black",
+  ground: "bg-yellow-700 text-white",
+  fairy: "bg-pink-400 text-white",
+  fighting: "bg-red-700 text-white",
+  psychic: "bg-pink-600 text-white",
+  rock: "bg-yellow-800 text-white",
+  ghost: "bg-indigo-800 text-white",
+  ice: "bg-blue-200 text-black",
+  dragon: "bg-indigo-600 text-white",
+  dark: "bg-gray-800 text-white",
+  steel: "bg-gray-500 text-white",
+  flying: "bg-sky-300 text-black",
 };
 
 const PokemonList = () => {
@@ -36,9 +59,9 @@ const PokemonList = () => {
   const [showTypeFilter, setShowTypeFilter] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
+  const [initialLoading, setInitialLoading] = useState(true);
   const limit = 20;
   const filterRef = useRef(null);
-  const loadMoreRef = useRef(null);
 
   useEffect(() => {
     const fetchAllNames = async () => {
@@ -63,6 +86,7 @@ const PokemonList = () => {
           })
         );
         setAllDetailedPokemon(detailed);
+        setInitialLoading(false);
       } catch (err) {
         console.error("Error al cargar detalles de todos los pokémons:", err);
       }
@@ -82,33 +106,16 @@ const PokemonList = () => {
     });
   }, [allDetailedPokemon]);
 
-  const handleLoadMore = () => {
-    if (loadMoreRef.current) {
-      gsap.fromTo(
-        loadMoreRef.current,
-        { scale: 1 },
-        {
-          scale: 1.2,
-          duration: 0.2,
-          yoyo: true,
-          repeat: 1,
-          ease: "power1.inOut",
-        }
-      );
-    }
-    setPage((prev) => prev + 1);
-  };
-
   const handleTypeToggle = (type) => {
     setSelectedTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   };
 
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
   const filteredList = () => {
-    let list = searchTerm ? fuse.search(searchTerm).map((r) => r.item) : allDetailedPokemon;
+    let list = searchTerm
+      ? fuse.search(searchTerm).map((r) => r.item)
+      : allDetailedPokemon;
     if (selectedTypes.length > 0) {
       list = list.filter((pokemon) =>
         pokemon.types.some((t) => selectedTypes.includes(t.type.name))
@@ -118,37 +125,39 @@ const PokemonList = () => {
     return displayedPokemons;
   };
 
-  const renderCard = (pokemon) => (
-    <div
-      key={pokemon.id}
-      onClick={() => setSelectedPokemon(pokemon)}
-      className="cursor-pointer"
-    >
-      <div className="bg-[#8b9dc3] p-4 rounded-lg shadow-md text-center transition-transform duration-300 ease-in-out hover:scale-105 border border-[#ffffff]">
-        <p className="font-bold text-[#212121] text-lg">#{pokemon.id}</p>
-        <img
-          src={pokemon.sprites.front_default}
-          alt={pokemon.name}
-          className="mx-auto w-20 h-20"
-        />
-        <p className="capitalize font-semibold text-[#212121] text-xl">
-          {capitalize(pokemon.name)}
-        </p>
-        <div className="mt-4">
-          {pokemon.types.map((typeSlot, index) => (
-            <span
-              key={index}
-              className={`inline-block text-sm px-2 py-1 rounded-full mx-1 ${
-                typeColors[typeSlot.type.name] || "bg-gray-300 text-black"
-              }`}
-            >
-              {typeTranslations[typeSlot.type.name] || capitalize(typeSlot.type.name)}
-            </span>
-          ))}
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+      if (
+        nearBottom &&
+        !searchTerm &&
+        selectedTypes.length === 0 &&
+        displayedPokemons.length < allDetailedPokemon.length
+      ) {
+        setPage((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [searchTerm, selectedTypes, displayedPokemons, allDetailedPokemon]);
+
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#1e2a38]">
+        <div className="flex flex-col items-center gap-4">
+          <img src={logo} alt="Cargando" className="w-20 h-20 animate-spin" />
+          <p className="text-cyan-300 text-lg font-semibold animate-pulse">
+            Cargando Pokédex...
+          </p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="p-4 mx-0 md:mx-10 lg:mx-32">
@@ -175,7 +184,9 @@ const PokemonList = () => {
               <span className="font-medium">Filtrar por tipo</span>
             </div>
             <ChevronDown
-              className={`w-4 h-4 transform transition-transform ${showTypeFilter ? "rotate-180" : "rotate-0"}`}
+              className={`w-4 h-4 transform transition-transform ${
+                showTypeFilter ? "rotate-180" : "rotate-0"
+              }`}
             />
           </button>
 
@@ -192,7 +203,9 @@ const PokemonList = () => {
                         className="accent-blue-500"
                       />
                       <span
-                        className={`text-sm w-full ${typeColors[type] || "bg-gray-200 text-black"} px-2 py-1 rounded`}
+                        className={`text-sm w-full ${
+                          typeColors[type] || "bg-gray-200 text-black"
+                        } px-2 py-1 rounded`}
                       >
                         {typeTranslations[type] || capitalize(type)}
                       </span>
@@ -206,21 +219,16 @@ const PokemonList = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-        {filteredList().map((p) => renderCard(p))}
+        {filteredList().map((p) => (
+          <PokemonCard
+            key={p.id}
+            pokemon={p}
+            onClick={() => setSelectedPokemon(p)}
+            typeColors={typeColors}
+            typeTranslations={typeTranslations}
+          />
+        ))}
       </div>
-
-      {!searchTerm && selectedTypes.length === 0 && (
-        <div className="flex justify-center mt-6">
-          <button
-            ref={loadMoreRef}
-            onClick={handleLoadMore}
-            className="bg-blue-500 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? "Cargando..." : "Cargar más"}
-          </button>
-        </div>
-      )}
 
       {selectedPokemon && (
         <PokemonModal
@@ -229,6 +237,16 @@ const PokemonList = () => {
           typeColors={typeColors}
           typeTranslations={typeTranslations}
         />
+      )}
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 bg-[#1e2a38] text-cyan-300 p-3 rounded-full shadow-lg hover:scale-110 hover:bg-[#2c3e50] transition-all duration-300 z-50 border border-cyan-400"
+          title="Volver arriba"
+        >
+          <ArrowUpCircle className="w-6 h-6" />
+        </button>
       )}
     </div>
   );
