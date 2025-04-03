@@ -1,4 +1,3 @@
-// src/components/PokemonModal.jsx
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
@@ -14,7 +13,7 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
       { opacity: 1, duration: 0.3 }
     ).fromTo(
       modalRef.current,
-      { y: -100, opacity: 0, scale: 0.8 },
+      { y: -50, opacity: 0, scale: 0.9 },
       { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" },
       "<"
     );
@@ -23,9 +22,9 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
   const handleClose = () => {
     const tl = gsap.timeline({ onComplete: onClose });
     tl.to(modalRef.current, {
-      y: -100,
+      y: -50,
       opacity: 0,
-      scale: 0.8,
+      scale: 0.9,
       duration: 0.3,
       ease: "power3.in",
     }).to(
@@ -43,18 +42,18 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
       onClick={handleClose}
     >
       <div
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-xl border border-gray-200"
+        className="bg-[#1f2937] text-white rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-gray-700"
       >
         <div className="text-right">
           <button
             onClick={handleClose}
-            className="text-gray-500 hover:text-red-500 text-lg font-bold"
+            className="text-gray-400 hover:text-red-400 text-xl font-bold"
           >
             &#10005;
           </button>
@@ -69,21 +68,21 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
             alt={pokemon.name}
             className="mx-auto w-28 h-28 drop-shadow-lg"
           />
-          <h2 className="text-2xl font-extrabold mt-2 text-gray-800">
+          <h2 className="text-2xl font-extrabold mt-2 text-white">
             {capitalize(pokemon.name)} #{pokemon.id}
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-400">
             Altura: {pokemon.height / 10} m | Peso: {pokemon.weight / 10} kg
           </p>
 
           <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-700">Tipos:</h3>
-            <div className="flex justify-center flex-wrap gap-2 mt-1">
+            <h3 className="text-lg font-semibold text-gray-300">Tipos:</h3>
+            <div className="flex justify-center flex-wrap gap-2 mt-2">
               {pokemon.types.map((t, i) => (
                 <span
                   key={i}
-                  className={`px-3 py-1 rounded-full text-sm shadow-sm border ${
-                    typeColors[t.type.name] || "bg-gray-300 text-black"
+                  className={`px-3 py-1 rounded-full text-sm font-medium border ${
+                    typeColors[t.type.name] || "bg-gray-600 text-white"
                   }`}
                 >
                   {typeTranslations[t.type.name] || capitalize(t.type.name)}
@@ -93,19 +92,19 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
           </div>
 
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-700">
+            <h3 className="text-lg font-semibold text-gray-300">
               Estadísticas:
             </h3>
-            <ul className="mt-2 text-left text-sm text-gray-700">
+            <ul className="mt-2 text-left text-sm">
               {pokemon.stats.map((stat, i) => (
-                <li key={i} className="mb-1">
-                  <div className="flex justify-between text-sm font-medium">
+                <li key={i} className="mb-2">
+                  <div className="flex justify-between text-sm font-medium text-gray-300">
                     <span>{capitalize(stat.stat.name)}</span>
                     <span>{stat.base_stat}</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                  <div className="w-full bg-gray-700 rounded-full h-2 mt-1">
                     <div
-                      className="bg-blue-400 h-2 rounded-full"
+                      className="bg-blue-500 h-2 rounded-full"
                       style={{ width: `${Math.min(stat.base_stat, 100)}%` }}
                     ></div>
                   </div>
@@ -114,7 +113,6 @@ const PokemonModal = ({ pokemon, onClose, typeColors, typeTranslations }) => {
             </ul>
           </div>
 
-          
         </div>
       </div>
     </div>
